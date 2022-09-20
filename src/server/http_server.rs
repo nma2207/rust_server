@@ -33,44 +33,26 @@ impl HttpServer {
     }
 
     async fn handle_connection(mut stream: TcpStream) {
-        let mut buf_reader = BufReader::new(&mut stream);
+        let buf_reader = BufReader::new(&mut stream);
 
-        let mut request_line = String::new();
-        buf_reader.read_line(&mut request_line).await.unwrap();
-        //let good_line = request_line.clone();
-        let good_line = request_line.clone();
-        // let mut k: u32 = 0;
-        // while true {
-        //     println!("{} {}", k, request_line);
-        //     buf_reader.read_line(&mut request_line).await.unwrap();
-        //     if request_line.contains("Cache-Control"){
-        //         break;
-        //     }
-        //     k+=1;
-        // }
 
-        // println!("here");
-        //let mut str_lines: Vec<String> = Vec::new();
+        let mut lines = buf_reader.lines();
+        
+        let mut count = 0;
+        let mut lines_vec: Vec<String> = Vec::new();
 
-        // buf_reader.read_line(buf)
+        while let Some(line) = lines.next().await {
+            count += 1;
+            let s = line.unwrap();
+            println!("{} {}", count, s);
+            if s.len() == 0 {
+                break;
+            }
+            lines_vec.push(s);
+        }
+        
+        let good_line = &lines_vec[0];
 
-        // lines.for_each(|l| {
-        //     match l {
-        //         Ok(s) => println!("{}", s),
-        //         _=> (),
-        //     }
-        // }).await;
-
-        // println!("here")
-
-        //let request_line :String = lines.next().await.unwrap().unwrap();
-
-        // while !request_line.is_empty()  {
-        //     print!("{}", request_line);
-        //     buf_reader.read_line(&mut request_line);
-        // }
-
-        println!("{}", request_line);
         let mut status_line = "HTTP/1.1 404 NOT FOUND";
         let mut filename = "templates/404.html";
         
